@@ -1,0 +1,119 @@
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, Session } from "@supabase/supabase-js";
+import { Languages, Plus, Map, Trophy, LogOut } from "lucide-react";
+
+const Navigation = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
+  return (
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2 text-primary hover:opacity-80 transition-opacity">
+            <Languages className="h-6 w-6" />
+            <span className="font-bold text-xl">DialectAI</span>
+          </Link>
+
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {user ? (
+              <>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/add-word">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Word
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/dialect-mapper">
+                    <Map className="h-4 w-4 mr-2" />
+                    Mapper
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/leaderboard">
+                    <Trophy className="h-4 w-4 mr-2" />
+                    Leaderboard
+                  </Link>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user.email?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/add-word">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Word
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/dialect-mapper">
+                        <Map className="h-4 w-4 mr-2" />
+                        Mapper
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/leaderboard">
+                        <Trophy className="h-4 w-4 mr-2" />
+                        Leaderboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button size="sm" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;
