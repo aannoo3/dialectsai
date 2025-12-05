@@ -8,9 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { User, Session } from "@supabase/supabase-js";
-import { Languages, Plus, Map, Trophy, LogOut } from "lucide-react";
+import { Languages, Plus, Map, Trophy, LogOut, Award, Globe } from "lucide-react";
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -43,7 +44,7 @@ const Navigation = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2 text-primary hover:opacity-80 transition-opacity">
-            <Languages className="h-6 w-6" />
+            <Globe className="h-6 w-6" />
             <span className="font-bold text-xl">DialectAI</span>
           </Link>
 
@@ -66,6 +67,12 @@ const Navigation = () => {
                   <Link to="/leaderboard">
                     <Trophy className="h-4 w-4 mr-2" />
                     Leaderboard
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/badges">
+                    <Award className="h-4 w-4 mr-2" />
+                    Badges
                   </Link>
                 </Button>
                 <DropdownMenu>
@@ -97,6 +104,13 @@ const Navigation = () => {
                         Leaderboard
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/badges">
+                        <Award className="h-4 w-4 mr-2" />
+                        Badges
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="md:hidden" />
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out
@@ -105,9 +119,17 @@ const Navigation = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Button size="sm" asChild>
-                <Link to="/auth">Sign In</Link>
-              </Button>
+              <>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/dialect-mapper">
+                    <Map className="h-4 w-4 mr-2" />
+                    Explore
+                  </Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/auth">Sign In</Link>
+                </Button>
+              </>
             )}
           </div>
         </div>

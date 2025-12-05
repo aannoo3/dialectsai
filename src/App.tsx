@@ -9,6 +9,7 @@ import AddWord from "./pages/AddWord";
 import WordDetail from "./pages/WordDetail";
 import DialectMapper from "./pages/DialectMapper";
 import Leaderboard from "./pages/Leaderboard";
+import Badges from "./pages/Badges";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +27,7 @@ const App = () => (
           <Route path="/word/:id" element={<WordDetail />} />
           <Route path="/dialect-mapper" element={<DialectMapper />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/badges" element={<Badges />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
