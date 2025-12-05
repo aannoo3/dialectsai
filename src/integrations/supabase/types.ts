@@ -59,11 +59,48 @@ export type Database = {
           },
         ]
       }
+      badges: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          icon: string
+          id: number
+          name: string
+          points_reward: number | null
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: number
+          name: string
+          points_reward?: number | null
+          requirement_type: string
+          requirement_value: number
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: number
+          name?: string
+          points_reward?: number | null
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
       dialects: {
         Row: {
           created_at: string | null
           id: number
           iso_code: string | null
+          language_id: number | null
           name: string
           region: string | null
         }
@@ -71,6 +108,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           iso_code?: string | null
+          language_id?: number | null
           name: string
           region?: string | null
         }
@@ -78,10 +116,19 @@ export type Database = {
           created_at?: string | null
           id?: number
           iso_code?: string | null
+          language_id?: number | null
           name?: string
           region?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dialects_language_id_fkey"
+            columns: ["language_id"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       entries: {
         Row: {
@@ -134,29 +181,103 @@ export type Database = {
           },
         ]
       }
-      profiles: {
+      languages: {
         Row: {
           created_at: string | null
-          email: string
-          id: string
+          id: number
+          iso_code: string | null
           name: string
-          points: number | null
+          native_name: string
+          region: string
+          speakers_estimate: string | null
         }
         Insert: {
           created_at?: string | null
-          email: string
-          id: string
+          id?: number
+          iso_code?: string | null
           name: string
-          points?: number | null
+          native_name: string
+          region: string
+          speakers_estimate?: string | null
         }
         Update: {
           created_at?: string | null
-          email?: string
-          id?: string
+          id?: number
+          iso_code?: string | null
           name?: string
-          points?: number | null
+          native_name?: string
+          region?: string
+          speakers_estimate?: string | null
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          audio_uploaded: number | null
+          created_at: string | null
+          email: string
+          id: string
+          last_contribution_date: string | null
+          name: string
+          points: number | null
+          streak_days: number | null
+          votes_cast: number | null
+          words_added: number | null
+        }
+        Insert: {
+          audio_uploaded?: number | null
+          created_at?: string | null
+          email: string
+          id: string
+          last_contribution_date?: string | null
+          name: string
+          points?: number | null
+          streak_days?: number | null
+          votes_cast?: number | null
+          words_added?: number | null
+        }
+        Update: {
+          audio_uploaded?: number | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          last_contribution_date?: string | null
+          name?: string
+          points?: number | null
+          streak_days?: number | null
+          votes_cast?: number | null
+          words_added?: number | null
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: number
+          earned_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: number
+          earned_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: number
+          earned_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -283,6 +404,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_and_award_badges: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
