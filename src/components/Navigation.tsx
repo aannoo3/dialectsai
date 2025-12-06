@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { User, Session } from "@supabase/supabase-js";
-import { Languages, Plus, Map, Trophy, LogOut, Award, Globe } from "lucide-react";
+import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame } from "lucide-react";
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -51,6 +51,12 @@ const Navigation = () => {
           <div className="flex items-center space-x-2 md:space-x-4">
             {user ? (
               <>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex text-orange-500 hover:text-orange-600">
+                  <Link to="/daily-challenge">
+                    <Flame className="h-4 w-4 mr-2" />
+                    Daily Challenge
+                  </Link>
+                </Button>
                 <Button variant="ghost" size="sm" asChild className="hidden md:flex">
                   <Link to="/add-word">
                     <Plus className="h-4 w-4 mr-2" />
@@ -86,6 +92,12 @@ const Navigation = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/daily-challenge" className="text-orange-500">
+                        <Flame className="h-4 w-4 mr-2" />
+                        Daily Challenge
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild className="md:hidden">
                       <Link to="/add-word">
                         <Plus className="h-4 w-4 mr-2" />

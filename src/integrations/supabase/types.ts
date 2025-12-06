@@ -95,6 +95,58 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_labels: {
+        Row: {
+          audio_url: string | null
+          created_at: string | null
+          dialect_id: number
+          id: string
+          label_text: string
+          seed_word_id: string
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string | null
+          dialect_id: number
+          id?: string
+          label_text: string
+          seed_word_id: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string | null
+          dialect_id?: number
+          id?: string
+          label_text?: string
+          seed_word_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_labels_dialect_id_fkey"
+            columns: ["dialect_id"]
+            isOneToOne: false
+            referencedRelation: "dialects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_labels_seed_word_id_fkey"
+            columns: ["seed_word_id"]
+            isOneToOne: false
+            referencedRelation: "seed_words"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_labels_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dialects: {
         Row: {
           created_at: string | null
@@ -247,6 +299,33 @@ export type Database = {
           streak_days?: number | null
           votes_cast?: number | null
           words_added?: number | null
+        }
+        Relationships: []
+      }
+      seed_words: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          difficulty: string | null
+          id: string
+          word_english: string
+          word_urdu: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          id?: string
+          word_english: string
+          word_urdu: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          id?: string
+          word_english?: string
+          word_urdu?: string
         }
         Relationships: []
       }

@@ -10,6 +10,7 @@ import WordDetail from "./pages/WordDetail";
 import DialectMapper from "./pages/DialectMapper";
 import Leaderboard from "./pages/Leaderboard";
 import Badges from "./pages/Badges";
+import DailyChallenge from "./pages/DailyChallenge";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/dialect-mapper" element={<DialectMapper />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/badges" element={<Badges />} />
+          <Route path="/daily-challenge" element={<DailyChallenge />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
