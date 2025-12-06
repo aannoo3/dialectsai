@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { User, Session } from "@supabase/supabase-js";
-import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame } from "lucide-react";
+import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame, Users } from "lucide-react";
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -76,6 +76,12 @@ const Navigation = () => {
                   </Link>
                 </Button>
                 <Button variant="ghost" size="sm" asChild className="hidden md:flex">
+                  <Link to="/tribe-competition">
+                    <Users className="h-4 w-4 mr-2" />
+                    Tribes
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex">
                   <Link to="/badges">
                     <Award className="h-4 w-4 mr-2" />
                     Badges
@@ -114,6 +120,12 @@ const Navigation = () => {
                       <Link to="/leaderboard">
                         <Trophy className="h-4 w-4 mr-2" />
                         Leaderboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/tribe-competition">
+                        <Users className="h-4 w-4 mr-2" />
+                        Tribes
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild className="md:hidden">

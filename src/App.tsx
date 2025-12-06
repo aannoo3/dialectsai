@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import TribeCompetition from "@/pages/TribeCompetition";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/badges" element={<Badges />} />
           <Route path="/daily-challenge" element={<DailyChallenge />} />
+          <Route path="/tribe-competition" element={<TribeCompetition />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
