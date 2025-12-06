@@ -478,6 +478,60 @@ export type Database = {
           },
         ]
       }
+      weekly_dialect_stats: {
+        Row: {
+          audio_uploaded: number | null
+          created_at: string | null
+          dialect_id: number
+          id: string
+          labels_added: number | null
+          points_earned: number | null
+          updated_at: string | null
+          user_id: string
+          week_start: string
+          words_added: number | null
+        }
+        Insert: {
+          audio_uploaded?: number | null
+          created_at?: string | null
+          dialect_id: number
+          id?: string
+          labels_added?: number | null
+          points_earned?: number | null
+          updated_at?: string | null
+          user_id: string
+          week_start: string
+          words_added?: number | null
+        }
+        Update: {
+          audio_uploaded?: number | null
+          created_at?: string | null
+          dialect_id?: number
+          id?: string
+          labels_added?: number | null
+          points_earned?: number | null
+          updated_at?: string | null
+          user_id?: string
+          week_start?: string
+          words_added?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_dialect_stats_dialect_id_fkey"
+            columns: ["dialect_id"]
+            isOneToOne: false
+            referencedRelation: "dialects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_dialect_stats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -487,6 +541,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: undefined
       }
+      get_week_start: { Args: { input_date?: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
