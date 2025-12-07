@@ -1,1 +1,4 @@
 project_id = "ninrqqafftehucvazvfr"
+
+[functions.wazir-voice-chat]
+verify_jwt = false
