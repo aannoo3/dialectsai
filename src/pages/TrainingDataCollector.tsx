@@ -4,9 +4,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Mic, Square, Play, Pause, Save, Trash2, Upload } from "lucide-react";
+import { Mic, Square, Play, Pause, Trash2, Upload, Volume2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
 
@@ -25,6 +25,9 @@ const TrainingDataCollector = () => {
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const listAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Fetch languages
   const { data: languages } = useQuery({
@@ -53,6 +56,26 @@ const TrainingDataCollector = () => {
       return data;
     },
     enabled: !!selectedLanguage,
+  });
+
+  // Fetch user's training data
+  const { data: trainingData } = useQuery({
+    queryKey: ["training-data"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data, error } = await supabase
+        .from("training_data")
+        .select(`
+          *,
+          languages(name),
+          dialects(name)
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
   });
 
   const startRecording = useCallback(async () => {
@@ -177,6 +200,7 @@ const TrainingDataCollector = () => {
 
       toast.success("Training data saved successfully!");
       discardRecording();
+      queryClient.invalidateQueries({ queryKey: ["training-data"] });
     } catch (error) {
       console.error("Error saving:", error);
       toast.error("Failed to save training data");
@@ -338,6 +362,56 @@ const TrainingDataCollector = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* My Contributions */}
+        {trainingData && trainingData.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="text-xl">My Contributions</CardTitle>
+              <CardDescription>
+                {trainingData.length} recording{trainingData.length !== 1 ? 's' : ''} saved
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <audio ref={listAudioRef} className="hidden" onEnded={() => setPlayingId(null)} />
+              {trainingData.map((item: any) => (
+                <div key={item.id} className="border rounded-lg p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          if (playingId === item.id) {
+                            listAudioRef.current?.pause();
+                            setPlayingId(null);
+                          } else {
+                            if (listAudioRef.current) {
+                              listAudioRef.current.src = item.audio_url;
+                              listAudioRef.current.play();
+                              setPlayingId(item.id);
+                            }
+                          }
+                        }}
+                      >
+                        {playingId === item.id ? <Pause className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        {item.duration_seconds}s • {item.dialects?.name} • {item.languages?.name}
+                      </span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-lg font-['Noto_Naskh_Arabic',_'Scheherazade_New',_serif]" dir="rtl">
+                    {item.transcript}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
