@@ -13,6 +13,7 @@ import Leaderboard from "./pages/Leaderboard";
 import Badges from "./pages/Badges";
 import DailyChallenge from "./pages/DailyChallenge";
 import WazirVoiceChat from "./pages/WazirVoiceChat";
+import TrainingDataCollector from "./pages/TrainingDataCollector";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/daily-challenge" element={<DailyChallenge />} />
           <Route path="/tribe-competition" element={<TribeCompetition />} />
           <Route path="/wazir-voice" element={<WazirVoiceChat />} />
+          <Route path="/training-data" element={<TrainingDataCollector />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
