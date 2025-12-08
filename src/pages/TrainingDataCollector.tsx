@@ -126,8 +126,8 @@ const TrainingDataCollector = () => {
   };
 
   const saveTrainingData = async () => {
-    if (!audioBlob || !transcript.trim() || !selectedDialect) {
-      toast.error("Please record audio, write transcript, and select dialect");
+    if (!audioBlob || !transcript.trim() || !selectedDialect || !selectedLanguage) {
+      toast.error("Please record audio, write transcript, and select language/dialect");
       return;
     }
 
@@ -141,9 +141,9 @@ const TrainingDataCollector = () => {
       }
 
       // Upload audio to storage
-      const fileName = `training/${user.id}/${Date.now()}.webm`;
+      const fileName = `${user.id}/${Date.now()}.webm`;
       const { error: uploadError } = await supabase.storage
-        .from("audio-files")
+        .from("training-audio")
         .upload(fileName, audioBlob);
 
       if (uploadError) {
@@ -154,14 +154,15 @@ const TrainingDataCollector = () => {
 
       // Get public URL
       const { data: urlData } = supabase.storage
-        .from("audio-files")
+        .from("training-audio")
         .getPublicUrl(fileName);
 
-      // Save to training_data table (we'll create this)
+      // Save to training_data table
       const { error: insertError } = await supabase
-        .from("training_data")
+        .from("training_data" as any)
         .insert({
           user_id: user.id,
+          language_id: parseInt(selectedLanguage),
           dialect_id: parseInt(selectedDialect),
           audio_url: urlData.publicUrl,
           transcript: transcript.trim(),
@@ -204,7 +205,7 @@ const TrainingDataCollector = () => {
           <CardHeader>
             <CardTitle className="text-2xl">Training Data Collector</CardTitle>
             <CardDescription>
-              Record audio in your dialect and write the transcript to help train the AI
+              Record audio in Wazir dialect and write the transcript in Pashto script to train the AI
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -306,16 +307,16 @@ const TrainingDataCollector = () => {
 
             {/* Transcript Section */}
             <div className="space-y-2">
-              <Label>Transcript (write what you said in the recording)</Label>
+              <Label>Transcript (Pashto Script - پښتو لیکنه)</Label>
               <Textarea
                 value={transcript}
                 onChange={(e) => setTranscript(e.target.value)}
-                placeholder="Write the transcript of your recording here in your dialect..."
-                className="min-h-[150px] text-lg"
-                dir="auto"
+                placeholder="دلته خپله ثبت شوې خبره په پښتو لیکنه ولیکئ..."
+                className="min-h-[150px] text-xl font-['Noto_Naskh_Arabic',_'Scheherazade_New',_serif]"
+                dir="rtl"
               />
               <p className="text-xs text-muted-foreground">
-                Write exactly what you said in the audio, using your dialect's script
+                Write exactly what you said in the audio using Pashto script (پښتو لیکنه)
               </p>
             </div>
 

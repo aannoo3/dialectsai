@@ -329,6 +329,64 @@ export type Database = {
         }
         Relationships: []
       }
+      training_data: {
+        Row: {
+          audio_url: string
+          created_at: string
+          dialect_id: number
+          duration_seconds: number | null
+          id: string
+          language_id: number
+          notes: string | null
+          transcript: string
+          user_id: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          dialect_id: number
+          duration_seconds?: number | null
+          id?: string
+          language_id: number
+          notes?: string | null
+          transcript: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          dialect_id?: number
+          duration_seconds?: number | null
+          id?: string
+          language_id?: number
+          notes?: string | null
+          transcript?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_data_dialect_id_fkey"
+            columns: ["dialect_id"]
+            isOneToOne: false
+            referencedRelation: "dialects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_data_language_id_fkey"
+            columns: ["language_id"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_data_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           badge_id: number

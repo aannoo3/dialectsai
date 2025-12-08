@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { User, Session } from "@supabase/supabase-js";
-import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame, Users, Mic } from "lucide-react";
+import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame, Users, Mic, Database } from "lucide-react";
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -93,6 +93,12 @@ const Navigation = () => {
                     Wazir AI
                   </Link>
                 </Button>
+                <Button variant="ghost" size="sm" asChild className="hidden md:flex text-green-500 hover:text-green-600">
+                  <Link to="/training-data">
+                    <Database className="h-4 w-4 mr-2" />
+                    Train AI
+                  </Link>
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="rounded-full">
@@ -144,6 +150,12 @@ const Navigation = () => {
                       <Link to="/wazir-voice" className="text-accent">
                         <Mic className="h-4 w-4 mr-2" />
                         Wazir AI
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="md:hidden">
+                      <Link to="/training-data" className="text-green-500">
+                        <Database className="h-4 w-4 mr-2" />
+                        Train AI
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="md:hidden" />
