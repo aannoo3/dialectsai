@@ -93,19 +93,15 @@ const AddWord = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (formData.languageId && defaultsLoaded) {
+    if (formData.languageId && dialects.length > 0) {
       const filtered = dialects.filter(
         (d) => d.language_id === parseInt(formData.languageId)
       );
       setFilteredDialects(filtered);
-      // Only reset dialect if user manually changed language (not on initial load)
-      if (!formData.dialectId || !filtered.some(d => d.id.toString() === formData.dialectId)) {
-        setFormData((prev) => ({ ...prev, dialectId: "" }));
-      }
     } else if (!formData.languageId) {
       setFilteredDialects([]);
     }
-  }, [formData.languageId, dialects, defaultsLoaded]);
+  }, [formData.languageId, dialects]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
