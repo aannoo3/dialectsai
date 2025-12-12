@@ -41,6 +41,7 @@ const AddWord = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [dialects, setDialects] = useState<Dialect[]>([]);
   const [filteredDialects, setFilteredDialects] = useState<Dialect[]>([]);
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
   const [formData, setFormData] = useState({
     word: "",
     languageId: "",
@@ -54,15 +55,15 @@ const AddWord = () => {
   const { checkAndAwardBadges } = useBadges(user?.id);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/auth");
-      } else {
-        setUser(session.user);
+        return;
       }
-    });
+      setUser(session.user);
 
-    const fetchData = async () => {
+      // Fetch languages and dialects
       const [languagesRes, dialectsRes] = await Promise.all([
         supabase.from("languages").select("*").order("name"),
         supabase.from("dialects").select("*").order("name"),
@@ -70,22 +71,41 @@ const AddWord = () => {
 
       if (languagesRes.data) setLanguages(languagesRes.data);
       if (dialectsRes.data) setDialects(dialectsRes.data);
+
+      // Fetch user's default language/dialect
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("default_language_id, default_dialect_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile?.default_language_id) {
+        setFormData((prev) => ({
+          ...prev,
+          languageId: profile.default_language_id.toString(),
+          dialectId: profile.default_dialect_id?.toString() || "",
+        }));
+      }
+      setDefaultsLoaded(true);
     };
 
-    fetchData();
+    init();
   }, [navigate]);
 
   useEffect(() => {
-    if (formData.languageId) {
+    if (formData.languageId && defaultsLoaded) {
       const filtered = dialects.filter(
         (d) => d.language_id === parseInt(formData.languageId)
       );
       setFilteredDialects(filtered);
-      setFormData((prev) => ({ ...prev, dialectId: "" }));
-    } else {
+      // Only reset dialect if user manually changed language (not on initial load)
+      if (!formData.dialectId || !filtered.some(d => d.id.toString() === formData.dialectId)) {
+        setFormData((prev) => ({ ...prev, dialectId: "" }));
+      }
+    } else if (!formData.languageId) {
       setFilteredDialects([]);
     }
-  }, [formData.languageId, dialects]);
+  }, [formData.languageId, dialects, defaultsLoaded]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -267,6 +267,8 @@ export type Database = {
         Row: {
           audio_uploaded: number | null
           created_at: string | null
+          default_dialect_id: number | null
+          default_language_id: number | null
           email: string
           id: string
           last_contribution_date: string | null
@@ -279,6 +281,8 @@ export type Database = {
         Insert: {
           audio_uploaded?: number | null
           created_at?: string | null
+          default_dialect_id?: number | null
+          default_language_id?: number | null
           email: string
           id: string
           last_contribution_date?: string | null
@@ -291,6 +295,8 @@ export type Database = {
         Update: {
           audio_uploaded?: number | null
           created_at?: string | null
+          default_dialect_id?: number | null
+          default_language_id?: number | null
           email?: string
           id?: string
           last_contribution_date?: string | null
@@ -300,7 +306,22 @@ export type Database = {
           votes_cast?: number | null
           words_added?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_default_dialect_id_fkey"
+            columns: ["default_dialect_id"]
+            isOneToOne: false
+            referencedRelation: "dialects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_default_language_id_fkey"
+            columns: ["default_language_id"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       seed_words: {
         Row: {
