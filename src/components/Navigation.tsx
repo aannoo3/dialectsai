@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { User, Session } from "@supabase/supabase-js";
-import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame, Users, Mic, Database } from "lucide-react";
+import { Languages, Plus, Map, Trophy, LogOut, Award, Globe, Flame, Users, Mic, Database, Settings } from "lucide-react";
 
 const Navigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -159,6 +159,12 @@ const Navigation = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="md:hidden" />
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Profile Settings
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out

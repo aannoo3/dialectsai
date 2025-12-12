@@ -49,6 +49,7 @@ const DailyChallenge = () => {
   const [submitting, setSubmitting] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const [category, setCategory] = useState<string>("all");
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
 
   const categories = ["all", "family", "food", "nature", "body", "actions", "time", "weather", "emotions", "colors", "numbers", "animals"];
 
@@ -64,10 +65,10 @@ const DailyChallenge = () => {
   }, [user, category]);
 
   useEffect(() => {
-    if (selectedLanguage) {
+    if (selectedLanguage && defaultsLoaded) {
       fetchDialects(parseInt(selectedLanguage));
     }
-  }, [selectedLanguage]);
+  }, [selectedLanguage, defaultsLoaded]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -76,6 +77,28 @@ const DailyChallenge = () => {
       return;
     }
     setUser(user);
+
+    // Load user's default language/dialect
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("default_language_id, default_dialect_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.default_language_id) {
+      setSelectedLanguage(profile.default_language_id.toString());
+      // Fetch dialects for this language and set default
+      const { data: dialectsData } = await supabase
+        .from("dialects")
+        .select("*")
+        .eq("language_id", profile.default_language_id)
+        .order("name");
+      if (dialectsData) setDialects(dialectsData);
+      if (profile.default_dialect_id) {
+        setSelectedDialect(profile.default_dialect_id.toString());
+      }
+    }
+    setDefaultsLoaded(true);
     setLoading(false);
   };
 
@@ -91,7 +114,10 @@ const DailyChallenge = () => {
       .eq("language_id", languageId)
       .order("name");
     if (data) setDialects(data);
-    setSelectedDialect("");
+    // Only reset dialect if user changed language manually (not on initial load with defaults)
+    if (defaultsLoaded && !dialects.some(d => d.id.toString() === selectedDialect)) {
+      setSelectedDialect("");
+    }
   };
 
   const fetchDailyWords = async () => {

@@ -20,6 +20,7 @@ const TrainingDataCollector = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
   const [selectedDialect, setSelectedDialect] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
+  const [defaultsLoaded, setDefaultsLoaded] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -28,6 +29,29 @@ const TrainingDataCollector = () => {
   const listAudioRef = useRef<HTMLAudioElement | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+
+  // Load user defaults on mount
+  useEffect(() => {
+    const loadDefaults = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("default_language_id, default_dialect_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.default_language_id) {
+        setSelectedLanguage(profile.default_language_id.toString());
+        if (profile.default_dialect_id) {
+          setSelectedDialect(profile.default_dialect_id.toString());
+        }
+      }
+      setDefaultsLoaded(true);
+    };
+    loadDefaults();
+  }, []);
 
   // Fetch languages
   const { data: languages } = useQuery({
