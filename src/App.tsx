@@ -15,6 +15,7 @@ import DailyChallenge from "./pages/DailyChallenge";
 import WazirVoiceChat from "./pages/WazirVoiceChat";
 import TrainingDataCollector from "./pages/TrainingDataCollector";
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/wazir-voice" element={<WazirVoiceChat />} />
           <Route path="/training-data" element={<TrainingDataCollector />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
