@@ -82,13 +82,13 @@ const TrainingDataCollector = () => {
     enabled: !!selectedLanguage,
   });
 
-  // Fetch user's training data
+  // Fetch user's training data filtered by selected dialect
   const { data: trainingData } = useQuery({
-    queryKey: ["training-data"],
+    queryKey: ["training-data", selectedDialect],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
-      const { data, error } = await supabase
+      let query = supabase
         .from("training_data")
         .select(`
           *,
@@ -97,9 +97,16 @@ const TrainingDataCollector = () => {
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
+      
+      if (selectedDialect) {
+        query = query.eq("dialect_id", parseInt(selectedDialect));
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
+    enabled: defaultsLoaded,
   });
 
   const startRecording = useCallback(async () => {
@@ -224,7 +231,7 @@ const TrainingDataCollector = () => {
 
       toast.success("Training data saved successfully!");
       discardRecording();
-      queryClient.invalidateQueries({ queryKey: ["training-data"] });
+      queryClient.invalidateQueries({ queryKey: ["training-data", selectedDialect] });
     } catch (error) {
       console.error("Error saving:", error);
       toast.error("Failed to save training data");
@@ -253,7 +260,7 @@ const TrainingDataCollector = () => {
           <CardHeader>
             <CardTitle className="text-2xl">Training Data Collector</CardTitle>
             <CardDescription>
-              Record audio in Wazir dialect and write the transcript in Pashto script to train the AI
+              Record audio in your dialect and write the transcript to train the AI
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -391,9 +398,11 @@ const TrainingDataCollector = () => {
         {trainingData && trainingData.length > 0 && (
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-xl">My Contributions</CardTitle>
+              <CardTitle className="text-xl">
+                {selectedDialect && dialects?.find(d => d.id.toString() === selectedDialect)?.name} Contributions
+              </CardTitle>
               <CardDescription>
-                {trainingData.length} recording{trainingData.length !== 1 ? 's' : ''} saved
+                {trainingData.length} recording{trainingData.length !== 1 ? 's' : ''} for this dialect
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
