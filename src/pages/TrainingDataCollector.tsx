@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Mic, Square, Play, Pause, Trash2, Upload, Volume2 } from "lucide-react";
+import { Mic, Square, Play, Pause, Trash2, Upload, Volume2, FileAudio } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ const TrainingDataCollector = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const listAudioRef = useRef<HTMLAudioElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
@@ -177,6 +179,36 @@ const TrainingDataCollector = () => {
     setAudioUrl(null);
     setTranscript("");
     setRecordingTime(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("audio/")) {
+      toast.error("Please upload an audio file");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
+      return;
+    }
+
+    setAudioBlob(file);
+    setAudioUrl(URL.createObjectURL(file));
+    setRecordingTime(0); // Will be calculated from audio metadata
+    
+    // Try to get audio duration
+    const audio = new Audio(URL.createObjectURL(file));
+    audio.onloadedmetadata = () => {
+      setRecordingTime(Math.round(audio.duration));
+    };
   };
 
   const saveTrainingData = async () => {
@@ -305,25 +337,54 @@ const TrainingDataCollector = () => {
             <div className="flex flex-col items-center gap-4 py-6 border rounded-lg bg-muted/30">
               {!audioBlob ? (
                 <>
-                  <Button
-                    size="lg"
-                    variant={isRecording ? "destructive" : "default"}
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className="rounded-full h-20 w-20"
-                  >
-                    {isRecording ? (
-                      <Square className="h-8 w-8" />
-                    ) : (
-                      <Mic className="h-8 w-8" />
-                    )}
-                  </Button>
-                  <span className="text-lg font-mono">
-                    {isRecording ? formatTime(recordingTime) : "Tap to record"}
-                  </span>
+                  <div className="flex gap-6 items-center">
+                    <div className="flex flex-col items-center gap-2">
+                      <Button
+                        size="lg"
+                        variant={isRecording ? "destructive" : "default"}
+                        onClick={isRecording ? stopRecording : startRecording}
+                        className="rounded-full h-20 w-20"
+                      >
+                        {isRecording ? (
+                          <Square className="h-8 w-8" />
+                        ) : (
+                          <Mic className="h-8 w-8" />
+                        )}
+                      </Button>
+                      <span className="text-sm text-muted-foreground">Record</span>
+                    </div>
+                    
+                    <span className="text-muted-foreground">or</span>
+                    
+                    <div className="flex flex-col items-center gap-2">
+                      <Input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="audio/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="audio-upload"
+                      />
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="rounded-full h-20 w-20"
+                        disabled={isRecording}
+                      >
+                        <FileAudio className="h-8 w-8" />
+                      </Button>
+                      <span className="text-sm text-muted-foreground">Upload</span>
+                    </div>
+                  </div>
+                  
                   {isRecording && (
-                    <span className="text-sm text-muted-foreground animate-pulse">
-                      Recording...
-                    </span>
+                    <>
+                      <span className="text-lg font-mono">{formatTime(recordingTime)}</span>
+                      <span className="text-sm text-muted-foreground animate-pulse">
+                        Recording...
+                      </span>
+                    </>
                   )}
                 </>
               ) : (
